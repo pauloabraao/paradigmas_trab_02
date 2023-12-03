@@ -15,4 +15,4 @@ ERROR: 1var1, variável não pode ser iniciada com caractere numérico.
 ```
 ### Estado Atual do Lexer.java
 
-O arquivo `Lexer.java` está em processo de correção do erro na análise léxica da declaração de variáveis. Após a resolução desse problema, a análise léxica estará completa para essa rotina.
+O arquivo `Lexer.java` está em processo de correção do erro na análise léxica da declaração de variáveis. Após a resolução desse problema, a análise léxica estará completa para essa rotina

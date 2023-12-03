@@ -1,3 +1,6 @@
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,13 +31,11 @@ public class Lexer {
                     }
                 }
 
-                String wordString = word.toString();
-                if ("True".equals(wordString)) {
-                    tokens.add(new Token(TokenType.TRUE_BOOLEAN, wordString));
-                } else if ("False".equals(wordString)) {
-                    tokens.add(new Token(TokenType.FALSE_BOOLEAN, wordString));
+                String wordString = word.toString().toLowerCase(); // Convert to lowercase for case-insensitivity
+                if (isTypeSpecifier(wordString)) {
+                    tokens.add(new Token(TokenType.TYPE_SPECIFIER, wordString));
                 } else {
-                    tokens.add(new Token(TokenType.VAR, wordString));
+                    tokens.add(new Token(TokenType.IDENTIFIER, wordString));
                 }
             } else if (Character.isDigit(currentChar)) {
                 // Start of a number
@@ -50,50 +51,24 @@ public class Lexer {
             } else {
                 // Handle other characters
                 switch (currentChar) {
-                    case '(':
-                        tokens.add(new Token(TokenType.LPAREN, Character.toString(currentChar)));
+                    case ',':
+                        tokens.add(new Token(TokenType.COMMA, Character.toString(currentChar)));
                         index++;
                         break;
-                    case ')':
-                        tokens.add(new Token(TokenType.RPAREN, Character.toString(currentChar)));
+                    case '[':
+                        tokens.add(new Token(TokenType.LEFT_SQUARE_BRACKET, Character.toString(currentChar)));
                         index++;
                         break;
-                    case '+':
-                        tokens.add(new Token(TokenType.OR, Character.toString(currentChar)));
+                    case ']':
+                        tokens.add(new Token(TokenType.RIGHT_SQUARE_BRACKET, Character.toString(currentChar)));
                         index++;
                         break;
-                    case '*':
-                        tokens.add(new Token(TokenType.AND, Character.toString(currentChar)));
-                        index++;
-                        break;
-                    case '-':
-                        if (index < length - 1 && inputString.substring(index, index + 2).equals("->")) {
-                            tokens.add(new Token(TokenType.IMPLIES, "->"));
-                            index += 2;
-                        } else {
-                            tokens.add(new Token(TokenType.UNKNOWN, Character.toString(currentChar)));
-                            index++;
-                        }
-                        break;
-                    case '<':
-                        if (index < length - 2 && inputString.substring(index, index + 3).equals("<->")) {
-                            tokens.add(new Token(TokenType.IFF, "<->"));
-                            index += 3;
-                        } else {
-                            tokens.add(new Token(TokenType.UNKNOWN, Character.toString(currentChar)));
-                            index++;
-                        }
-                        break;
-                    case '¬':
-                        tokens.add(new Token(TokenType.NOT, Character.toString(currentChar)));
-                        index++;
-                        break;
-                    case '=':
-                        tokens.add(new Token(TokenType.EQUAL, Character.toString(currentChar)));
+                     case ';':
+                        tokens.add(new Token(TokenType.SEMICOLON, Character.toString(currentChar)));
                         index++;
                         break;
                     default:
-                        tokens.add(new Token(TokenType.UNKNOWN, Character.toString(currentChar)));
+                        // Ignore other characters for simplicity
                         index++;
                         break;
                 }
@@ -103,13 +78,25 @@ public class Lexer {
         return tokens;
     }
 
-    public static void main(String[] args) {
-        String input = "A+B -> 7 <-> I \\o";
-        String processedInput = processInput(input);
-        System.out.println("Processed input: " + processedInput);
+    private static boolean isTypeSpecifier(String word) {
+        // Check if the word is a type specifier
+        return word.equals("int") || word.equals("char") || word.equals("float") ||
+               word.equals("double") || word.equals("short") || word.equals("long") ||
+               word.equals("signed") || word.equals("unsigned");
+    }
 
+    public static void main(String[] args) {
+        Path caminho = Paths.get("file.txt");
+        try {
+        byte[] texto = Files.readAllBytes(caminho);
+        String leitura = new String(texto);
+        String processedInput = processInput(leitura);
+        System.out.println("Processed input: " + processedInput);
         List<Token> tokens = lexer(processedInput);
         System.out.println("Tokens: " + tokens);
+        }catch(Exception e) {
+        	System.out.println("Erro de Leitura!");
+        } 
     }
 
     private static String processInput(String input) {
@@ -144,5 +131,5 @@ class Token {
 }
 
 enum TokenType {
-    VAR, NUM, LPAREN, RPAREN, OR, AND, IMPLIES, IFF, NOT, EQUAL, TRUE_BOOLEAN, FALSE_BOOLEAN, UNKNOWN
+    TYPE_SPECIFIER, IDENTIFIER, NUM, COMMA, SEMICOLON, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET, UNKNOWN
 }

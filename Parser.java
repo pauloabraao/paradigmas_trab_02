@@ -51,8 +51,7 @@ public class Parser {
         identifier(inputArray);
         if(inputArray.length > nextToken && inputArray[nextToken].equals("LEFT_SQUARE_BRACKET")){
             array_size(inputArray);
-        }
-    
+        } 
     }
 
     public static void array_size(String[] inputArray){

@@ -1,15 +1,18 @@
-Resolver erro no Lexer.java:
- 1var1 deveria ser reconhecido como nome de uma variavel e deveria dá erro, pois uma variavel nao pode iniciar com número. 
+### Correção de erro no Lexer.java
 
-Saída do código:
+#### Problema
+O arquivo `Lexer.java` está apresentando um problema em que a entrada `1var1` está sendo reconhecida como o nome de uma variável, embora deveria resultar em um erro, uma vez que uma variável não pode iniciar com um número.
 
+#### Saída Atual do Código
+```
 Processed input: int 1var1;
 Tokens: [(TYPE_SPECIFIER, int), (NUM, 1), (IDENTIFIER, var1)]
+```
 
-Saída esperada:
+#### Saída Esperada
+```
+ERROR: 1var1, variável não pode ser iniciada com caractere numérico.
+```
+### Estado Atual do Lexer.java
 
-ERROR: 1var1, variavel não pode ser iniciada com caractere númerico.
-
-Estado atual do Lexer.java:
-Resolvendo erro a anáise léxica da declaração de variaveis estará completa
-
+O arquivo `Lexer.java` está em processo de correção do erro na análise léxica da declaração de variáveis. Após a resolução desse problema, a análise léxica estará completa para essa rotina.

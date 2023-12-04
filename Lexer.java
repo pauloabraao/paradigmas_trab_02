@@ -2,6 +2,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Lexer {
@@ -14,14 +15,12 @@ public class Lexer {
         while (index < length) {
             char currentChar = inputString.charAt(index);
 
-            // Ignore whitespace and newline characters
             if (Character.isWhitespace(currentChar)) {
                 index++;
                 continue;
             }
 
             if (Character.isLetter(currentChar)) {
-                // Start of a variable (word)
                 StringBuilder word = new StringBuilder();
                 while (index < length && (Character.isLetterOrDigit(currentChar) || currentChar == '_')) {
                     word.append(currentChar);
@@ -31,14 +30,14 @@ public class Lexer {
                     }
                 }
 
-                String wordString = word.toString().toLowerCase(); // Convert to lowercase for case-insensitivity
+                String wordString = word.toString().toLowerCase();
                 if (isTypeSpecifier(wordString)) {
                     tokens.add(new Token(TokenType.TYPE_SPECIFIER, wordString));
                 } else {
                     tokens.add(new Token(TokenType.IDENTIFIER, wordString));
                 }
             } else if (Character.isDigit(currentChar)) {
-                // Start of a number
+        
                 StringBuilder num = new StringBuilder();
                 while (index < length && Character.isDigit(currentChar)) {
                     num.append(currentChar);
@@ -78,6 +77,29 @@ public class Lexer {
         return tokens;
     }
 
+    public static TokenType[] getTokenTypes(String inputString) {
+        List<Token> tokens = lexer(inputString);
+        TokenType[] tokenTypes = new TokenType[tokens.size()];
+
+        for (int i = 0; i < tokens.size(); i++) {
+            tokenTypes[i] = tokens.get(i).getType();
+        }
+
+        return tokenTypes;
+    }
+
+    public static String[] getTokenValue(String inputString) {
+        List<Token> tokens = lexer(inputString);
+        String[] tokenValue = new String[tokens.size()];
+
+        for (int i = 0; i < tokens.size(); i++) {
+            tokenValue[i] = tokens.get(i).getValue();
+        }
+
+        return tokenValue;
+    }
+
+
     private static boolean isTypeSpecifier(String word) {
         // Check if the word is a type specifier
         return word.equals("int") || word.equals("char") || word.equals("float") ||
@@ -94,23 +116,25 @@ public class Lexer {
         System.out.println("Processed input: " + processedInput);
         List<Token> tokens = lexer(processedInput);
         System.out.println("Tokens: " + tokens);
+        TokenType[] tokenTypes = getTokenTypes(processedInput);
+            System.out.println("Token Types: " + Arrays.toString(tokenTypes));
         }catch(Exception e) {
         	System.out.println("Erro de Leitura!");
         } 
     }
 
-    private static String processInput(String input) {
-        // Remove comments from the input
+    
+
+    static String processInput(String input) {
+
         input = input.replaceAll("\\\\.*", "");
 
-        // Find the expression in the input (ignoring comments)
         StringBuilder expression = new StringBuilder();
         String[] lines = input.split("\n");
         for (String line : lines) {
             expression.append(line);
         }
 
-        // Remove extra whitespace
         return expression.toString().trim();
     }
 }
@@ -122,6 +146,14 @@ class Token {
     public Token(TokenType type, String value) {
         this.type = type;
         this.value = value;
+    }
+    
+    public TokenType getType() {
+        return type;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     @Override

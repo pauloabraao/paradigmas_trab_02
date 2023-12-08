@@ -31,7 +31,16 @@ public class Lexer {
                 }
 
                 String wordString = word.toString().toLowerCase();
-                if (isTypeSpecifier(wordString)) {
+                if (isMain(wordString)) {
+                    tokens.add(new Token(TokenType.MAIN, wordString));
+                }
+                else if (isIfStatement(wordString)){
+                    tokens.add(new Token(TokenType.IF_STATEMENT, wordString));
+                }
+                else if (isElseStatement(wordString)){
+                    tokens.add(new Token(TokenType.ELSE_STATEMENT, wordString));
+                }
+                else if (isTypeSpecifier(wordString)) {
                     tokens.add(new Token(TokenType.TYPE_SPECIFIER, wordString));
                 } else {
                     tokens.add(new Token(TokenType.IDENTIFIER, wordString));
@@ -62,12 +71,102 @@ public class Lexer {
                         tokens.add(new Token(TokenType.RIGHT_SQUARE_BRACKET, Character.toString(currentChar)));
                         index++;
                         break;
-                     case ';':
+                    case '(':
+                        tokens.add(new Token(TokenType.LEFT_PARENTHESES, Character.toString(currentChar)));
+                        index++;
+                        break;
+                    case ')':
+                        tokens.add(new Token(TokenType.RIGHT_PARENTHESES, Character.toString(currentChar)));
+                        index++;
+                        break;
+                    case '{':
+                        tokens.add(new Token(TokenType.LEFT_BRACKET, Character.toString(currentChar)));
+                        index++;
+                        break;
+                    case '}':
+                        tokens.add(new Token(TokenType.RIGHT_BRACKET, Character.toString(currentChar)));
+                        index++;
+                        break;
+                    case ';':
                         tokens.add(new Token(TokenType.SEMICOLON, Character.toString(currentChar)));
                         index++;
                         break;
+                    case '+':
+                        tokens.add(new Token(TokenType.SUM_OP, Character.toString(currentChar)));
+                        index++;
+                        break;
+                    case '-':
+                        tokens.add(new Token(TokenType.SUB_OP, Character.toString(currentChar)));
+                        index++;
+                        break;
+                    case '*':
+                        tokens.add(new Token(TokenType.MULT_OP, Character.toString(currentChar)));
+                        index++;
+                        break;
+                    case '/':
+                        tokens.add(new Token(TokenType.DIV_OP, Character.toString(currentChar)));
+                        index++;
+                        break;
+                    case '=':
+                        if (index + 1 < length && inputString.charAt(index + 1) == '=') {
+                            tokens.add(new Token(TokenType.EQUALS, "=="));
+                            index += 2;
+                        } else {
+                            tokens.add(new Token(TokenType.ASSIGN_OP, Character.toString(currentChar)));
+                            index++;
+                        }
+                        break;
+                    case '!':
+                        if (index + 1 < length && inputString.charAt(index + 1) == '=') {
+                            tokens.add(new Token(TokenType.NOT_EQUALS, "!="));
+                            index += 2;
+                        } else {
+                            //error
+                            index++;
+                        }
+                        break;
+    
+                    case '<':
+                        if (index + 1 < length && inputString.charAt(index + 1) == '=') {
+                            tokens.add(new Token(TokenType.LESS_THAN_OR_EQUALS, "<="));
+                            index += 2;
+                        } else {
+                            tokens.add(new Token(TokenType.LESS_THAN, Character.toString(currentChar)));
+                            index++;
+                            break;
+                        }
+                        break;
+                    case '>':
+                        if (index + 1 < length && inputString.charAt(index + 1) == '=') {
+                            tokens.add(new Token(TokenType.GREATER_THAN_OR_EQUALS, ">="));
+                            index += 2;
+                        } else {
+                            tokens.add(new Token(TokenType.GREATER_THAN, Character.toString(currentChar)));
+                            index++;
+                            break;
+                        }
+                        break;
+                    case '|':
+                        if (index + 1 < length && inputString.charAt(index + 1) == '|') {
+                            tokens.add(new Token(TokenType.OR_OP, "||"));
+                            index += 2;
+                        } else {
+                            tokens.add(new Token(TokenType.UNKNOWN, Character.toString(currentChar)));
+                            index++;
+                            break;
+                        }
+                        break;
+                    case '&':
+                        if (index + 1 < length && inputString.charAt(index + 1) == '&') {
+                            tokens.add(new Token(TokenType.AND_OP, "&&"));
+                            index += 2;
+                        } else {
+                            tokens.add(new Token(TokenType.UNKNOWN, Character.toString(currentChar)));
+                            index++;
+                            break;
+                        }
+                        break;
                     default:
-                        // Ignore other characters for simplicity
                         index++;
                         break;
                 }
@@ -107,6 +206,21 @@ public class Lexer {
                word.equals("signed") || word.equals("unsigned");
     }
 
+    private static boolean isMain(String word) {
+        // Check if the word is a type specifier
+        return word.equals("main");
+    }
+
+    private static boolean isIfStatement(String word) {
+        // Check if the word is a type specifier
+        return word.equals("if");
+    }
+
+    private static boolean isElseStatement(String word) {
+        // Check if the word is a type specifier
+        return word.equals("else");
+    }
+
     public static void main(String[] args) {
         Path caminho = Paths.get("file.txt");
         try {
@@ -115,15 +229,13 @@ public class Lexer {
         String processedInput = processInput(leitura);
         System.out.println("Processed input: " + processedInput);
         List<Token> tokens = lexer(processedInput);
-        System.out.println("Tokens: " + tokens);
+        System.out.println("Lexical Analysis: " + tokens);
         TokenType[] tokenTypes = getTokenTypes(processedInput);
             System.out.println("Token Types: " + Arrays.toString(tokenTypes));
         }catch(Exception e) {
         	System.out.println("Erro de Leitura!");
         } 
     }
-
-    
 
     static String processInput(String input) {
 
@@ -163,6 +275,9 @@ class Token {
 }
 
 enum TokenType {
-    TYPE_SPECIFIER, IDENTIFIER, NUM, COMMA, SEMICOLON, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET, UNKNOWN
+    TYPE_SPECIFIER, IDENTIFIER, NUM, COMMA, SEMICOLON, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET, UNKNOWN, 
+    MAIN, LEFT_PARENTHESES, RIGHT_PARENTHESES, LEFT_BRACKET, RIGHT_BRACKET, SUM_OP, SUB_OP, MULT_OP, DIV_OP, 
+    EQUALS, ASSIGN_OP, NOT_EQUALS, LESS_THAN, GREATER_THAN, LESS_THAN_OR_EQUALS, GREATER_THAN_OR_EQUALS, OR_OP, AND_OP, 
+    IF_STATEMENT, ELSE_STATEMENT
 }
 

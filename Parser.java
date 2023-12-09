@@ -331,12 +331,9 @@ public class Parser {
          else if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.NUM)){
             digit(tokenArray, lexemeArray);
          }
-        else{
-             System.out.println("ERROR: Next token expected is IDENTIFIER or NUM");
-             System.exit(0);
-        }
+        
 
-        if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_PARENTHESES)){
+        else if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_PARENTHESES)){
             System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
             nextToken += 1;
             expression(tokenArray, lexemeArray);
@@ -347,7 +344,11 @@ public class Parser {
                 System.out.println("ERROR: Next token expected is RIGHT_PARENTHESES");
                 System.exit(0);
             }
+        }else{
+             System.out.println("ERROR: Next token expected is IDENTIFIER or NUM");
+             System.exit(0);
         }
+
         System.out.println("Exit <factor>");     
     }
 
@@ -356,6 +357,8 @@ public class Parser {
         System.out.println("Enter <logical_expression>");
         logical_term(tokenArray, lexemeArray);
         while(tokenArray.length > nextToken && (tokenArray[nextToken].equals(TokenType.AND_OP))){
+            System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+            nextToken += 1;
             logical_term(tokenArray, lexemeArray);
         }
         System.out.println("Exit <logical_expression>");
@@ -364,6 +367,8 @@ public class Parser {
         System.out.println("Enter <logical_term>");
         comparison_expression(tokenArray, lexemeArray);
         while(tokenArray.length > nextToken && (tokenArray[nextToken].equals(TokenType.OR_OP))){
+            System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+            nextToken += 1;
             comparison_expression(tokenArray, lexemeArray);
         }
         System.out.println("Exit <logical_term>");

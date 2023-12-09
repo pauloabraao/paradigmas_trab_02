@@ -51,7 +51,9 @@ public class Parser {
             isIfStatement(tokenArray, lexemeArray);
             isVarDeclaration(tokenArray, lexemeArray);
             isWhileStatement(tokenArray, lexemeArray);
+            isDoStatement(tokenArray, lexemeArray);
             isAssigment(tokenArray, lexemeArray);
+
         }while(!tokenArray[nextToken].equals(TokenType.RIGHT_BRACKET));
         
     }
@@ -79,9 +81,19 @@ public class Parser {
 
      public static void isWhileStatement(TokenType[] tokenArray, String[] lexemeArray) {
 
-        while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.WHILE)) {  
+        while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.WHILE_STATEMNET)) {  
             System.out.print("\n");
             while_statement(tokenArray, lexemeArray);
+            System.out.print("\n");
+            
+        }
+    }
+
+    public static void isDoStatement(TokenType[] tokenArray, String[] lexemeArray) {
+
+        while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.DO_STATEMENT)) {  
+            System.out.print("\n");
+            do_statement(tokenArray, lexemeArray);
             System.out.print("\n");
             
         }
@@ -467,7 +479,7 @@ public class Parser {
         System.out.println("Exit <assignment_statement>");
     }
      public static void while_statement(TokenType[] tokenArray, String[] lexemeArray){
-        if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.WHILE)){
+        if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.WHILE_STATEMNET)){
             System.out.println("Enter <while_statement>");
             nextToken += 1;
             if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_PARENTHESES)){
@@ -503,4 +515,51 @@ public class Parser {
             System.out.println("Exit <while_statement>");
         }
      } 
+
+
+     public static void do_statement(TokenType[] tokenArray, String[] lexemeArray){
+        if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.DO_STATEMENT)){
+            System.out.println("Enter <do_statement>");
+            nextToken += 1;
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_BRACKET)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+            }else{
+                System.out.println("ERROR: Next token expected is LEFT_BRACKET");
+                System.exit(0);
+            }
+            statement(tokenArray, lexemeArray);
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.RIGHT_BRACKET)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+            }else{
+                System.out.println("ERROR: Next token expected is RIGHT_BRACKET");
+                System.exit(0);
+            }
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.WHILE_STATEMNET)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+            }else{
+                System.out.println("ERROR: Next token expected is WHILE_STATEMNET");
+                System.exit(0);
+            }
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_PARENTHESES)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+                logical_expression(tokenArray, lexemeArray);
+                if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.RIGHT_PARENTHESES)){
+                    System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                    nextToken += 1;
+                }else{
+                    System.out.println("ERROR: Next token expected is RIGHT_PARENTHESES");
+                    System.exit(0);
+                }
+            }else{
+                System.out.println("ERROR: Next token expected is LEFT_PARENTHESES");
+                System.exit(0);
+            }
+            
+            System.out.println("Exit <do_statement>");
+        }
+     }
 }

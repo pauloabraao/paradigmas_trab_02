@@ -34,8 +34,11 @@ public class Lexer {
                 if (isMain(wordString)) {
                     tokens.add(new Token(TokenType.MAIN, wordString));
                 }
+                else if (isDoStatement(wordString)){
+                    tokens.add(new Token(TokenType.DO_STATEMENT, wordString));
+                }
                 else if (isWhileStatement(wordString)){
-                    tokens.add(new Token(TokenType.WHILE, wordString));
+                    tokens.add(new Token(TokenType.WHILE_STATEMNET, wordString));
                 }
                 else if (isIfStatement(wordString)){
                     tokens.add(new Token(TokenType.IF_STATEMENT, wordString));
@@ -239,6 +242,11 @@ public class Lexer {
         return word.equals("while");
     }
 
+    private static boolean isDoStatement(String word) {
+        // Check if the word is a type specifier
+        return word.equals("do");
+    }
+
     public static void main(String[] args) {
         List<Token> allTokens = new ArrayList<Token>();
         String caminho = "file.txt";
@@ -306,6 +314,6 @@ enum TokenType {
     TYPE_SPECIFIER, IDENTIFIER, NUM, COMMA, SEMICOLON, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET, UNKNOWN, 
     MAIN, LEFT_PARENTHESES, RIGHT_PARENTHESES, LEFT_BRACKET, RIGHT_BRACKET, SUM_OP, SUB_OP, MULT_OP, DIV_OP, 
     EQUALS, ASSIGN_OP, NOT_EQUALS, LESS_THAN, GREATER_THAN, LESS_THAN_OR_EQUALS, GREATER_THAN_OR_EQUALS, OR_OP, AND_OP, 
-    IF_STATEMENT, ELSE_STATEMENT, WHILE
+    IF_STATEMENT, ELSE_STATEMENT, WHILE_STATEMNET, DO_STATEMENT
 }
 

@@ -26,11 +26,9 @@ public class Parser {
             lexemeArray = Lexer.getTokenValue(processedInput);
 
            
-            isMainDeclaration(tokenArray, lexemeArray);
-            isVarDeclaration(tokenArray, lexemeArray);
-            isExpression(tokenArray, lexemeArray);
-            isIfStatement(tokenArray, lexemeArray);
-            isAssigment(tokenArray, lexemeArray);
+            program(tokenArray, lexemeArray);
+            //isExpression(tokenArray, lexemeArray);
+            //isAssigment(tokenArray, lexemeArray);
             
         } catch (Exception e) {
             System.out.println("Error reading file: " + e);
@@ -38,56 +36,93 @@ public class Parser {
   
     }
 
-    public static void isExpression(TokenType[] tokenArray, String[] lexemeArray) {
-        while (tokenArray.length > nextToken && 
-        (tokenArray[nextToken].equals(TokenType.NUM) || tokenArray[nextToken].equals(TokenType.IDENTIFIER)) && 
-        (tokenArray[nextToken + 1].equals(TokenType.SUM_OP) || 
-        tokenArray[nextToken + 1].equals(TokenType.SUB_OP))) {  
-            expression(tokenArray, lexemeArray);
-            System.out.println("\n");
-            nextToken++;
-        }
+    public static void statement(TokenType[] tokenArray, String[] lexemeArray) {
+        do{
+            isIfStatement(tokenArray, lexemeArray);
+            isVarDeclaration(tokenArray, lexemeArray);
+            isWhileStatement(tokenArray, lexemeArray);
+            isAssigment(tokenArray, lexemeArray);
+        }while(!tokenArray[nextToken].equals(TokenType.RIGHT_BRACKET));
+        
     }
+
+    
 
     public static void isMainDeclaration(TokenType[] tokenArray, String[] lexemeArray) {
 
         while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.TYPE_SPECIFIER) && tokenArray[nextToken + 1].equals(TokenType.MAIN)) {  
             program(tokenArray, lexemeArray);
             System.out.println("\n");
-            nextToken++;
+            
         }
     }
 
     public static void isIfStatement(TokenType[] tokenArray, String[] lexemeArray) {
 
         while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.IF_STATEMENT)) {  
+            System.out.print("\n");
             if_statement(tokenArray, lexemeArray);
-            System.out.println("\n");
-            nextToken++;
+            System.out.print("\n");
+            
+        }
+    }
+
+     public static void isWhileStatement(TokenType[] tokenArray, String[] lexemeArray) {
+
+        while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.WHILE)) {  
+            System.out.print("\n");
+            while_statement(tokenArray, lexemeArray);
+            System.out.print("\n");
+            
         }
     }
 
     public static void isVarDeclaration(TokenType[] tokenArray, String[] lexemeArray) {
 
         while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.TYPE_SPECIFIER) && !tokenArray[nextToken + 1].equals(TokenType.MAIN)) {  
+            System.out.print("\n");
             declaration(tokenArray, lexemeArray);
-            System.out.println("\n");
-            nextToken++;
+            System.out.print("\n");
+            
         }
     }
 
     public static void isAssigment(TokenType[] tokenArray, String[] lexemeArray) {
 
-            while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.IDENTIFIER)) {  
+        if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.IDENTIFIER) && tokenArray[nextToken + 1].equals(TokenType.ASSIGN_OP)){
+            while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.IDENTIFIER) && tokenArray[nextToken + 1].equals(TokenType.ASSIGN_OP)) {  
+                System.out.print("\n");
                 assignment_statement(tokenArray, lexemeArray);
+                if(tokenArray.length > nextToken && !tokenArray[nextToken].equals(TokenType.SEMICOLON)){
+                    System.out.println("ERROR: Next token expected is SEMICOLON");
+                    System.exit(0);
+                }else{
+                    System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                    nextToken+=1;
+                }
+                System.out.print("\n");   
+            }
+        }else{
+            while (tokenArray.length > nextToken && (tokenArray[nextToken].equals(TokenType.NUM) || tokenArray[nextToken].equals(TokenType.IDENTIFIER))){  
                 System.out.println("\n");
-                nextToken++;
+                expression(tokenArray, lexemeArray);
+                if(tokenArray.length > nextToken && !tokenArray[nextToken].equals(TokenType.SEMICOLON)){
+                    System.out.println("ERROR: Next token expected is SEMICOLON");
+                    System.exit(0);
+                }else{
+                    System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                    nextToken+=1;
+                }
+                System.out.println("\n");
+            }
         }
+        
+        
     }
 
     public static void declaration(TokenType[] tokenArray, String[] lexemeArray) {
 
-        System.out.println("Enter <declaration>");
+        System.out.println("\nEnter <declaration>");
         type_specifier(tokenArray, lexemeArray);
         declarator_list(tokenArray, lexemeArray);
         System.out.println("Exit <declaration>");
@@ -136,6 +171,7 @@ public class Parser {
             System.exit(0);
         }else{
             System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+            nextToken+=1;
         }
 
         System.out.println("Exit <declarator>"); 
@@ -237,11 +273,12 @@ public class Parser {
             System.out.println("ERROR: Next token expected is LEFT_BRACKET");
             System.exit(0);
         }
+        statement(tokenArray, lexemeArray);
         if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.RIGHT_BRACKET)){
             System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
             nextToken += 1;
         }else{
-            System.out.println("ERROR: Next token expected is RIGHT_BRACKET");
+            System.out.println("ERROR: Next token expected is RIGHT_BRACKET--");
             System.exit(0);
         }
         System.out.println("Exit <function_declaration>");
@@ -353,6 +390,22 @@ public class Parser {
                 System.exit(0);
             }
 
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_BRACKET)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+            }else{
+                System.out.println("ERROR: Next token expected is LEFT_BRACKET");
+                System.exit(0);
+            }
+            statement(tokenArray, lexemeArray);
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.RIGHT_BRACKET)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+            }else{
+                System.out.println("ERROR: Next token expected is RIGHT_BRACKET");
+                System.exit(0);
+            }
+
             if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.ELSE_STATEMENT)){
                 System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
                 nextToken += 1;
@@ -375,7 +428,7 @@ public class Parser {
                 System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
                 nextToken += 1;
             }else{
-               System.out.println("ERROR: Next token expected is IF_STATEMENT");
+               System.out.println("ERROR: Next token expected is ASSIGN_OP");
                System.exit(0); 
             }
             expression(tokenArray, lexemeArray);
@@ -385,12 +438,34 @@ public class Parser {
                 System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
                 nextToken += 1;
             }else{
-               System.out.println("ERROR: Next token expected is IF_STATEMENT");
+               System.out.println("ERROR: Next token expected is ASSIGN_OP");
                System.exit(0); 
             }
             expression(tokenArray, lexemeArray);
         }
+        
         System.out.println("Exit <assignment_statement>");
-
-    }      
+    }
+     public static void while_statement(TokenType[] tokenArray, String[] lexemeArray){
+        if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.WHILE)){
+            System.out.println("Enter <while_statement>");
+            nextToken += 1;
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_PARENTHESES)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+                logical_expression(tokenArray, lexemeArray);
+                if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.RIGHT_PARENTHESES)){
+                    System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                    nextToken += 1;
+                }else{
+                    System.out.println("ERROR: Next token expected is RIGHT_PARENTHESES");
+                    System.exit(0);
+                }
+            }else{
+                System.out.println("ERROR: Next token expected is LEFT_PARENTHESES");
+                System.exit(0);
+            }
+            System.out.println("Exit <while_statement>");
+        }
+     } 
 }

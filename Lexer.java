@@ -58,6 +58,17 @@ public class Lexer {
                         currentChar = inputString.charAt(index);
                     }
                 }
+                if(index < length && Character.isLetter(currentChar)) {
+                    while (index < length) {
+                        num.append(currentChar);
+                        index++;
+                        if (index < length) {
+                            currentChar = inputString.charAt(index);
+                        }
+                    }
+                    System.out.println(num + "\nError: Variable name cannot start with number");
+                    System.exit(0);
+                }
                 tokens.add(new Token(TokenType.NUM, num.toString()));
             } else {
                 // Handle other characters

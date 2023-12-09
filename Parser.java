@@ -1,37 +1,47 @@
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 
 public class Parser {
+    
     public static int nextToken = 0;
+    public static int numberLine = 1;
     public static void main(String[] args) {
-
+       
         TokenType[] tokenTypes;
         TokenType[] tokenArray;
         String[] lexemeArray;
+        List<Token> allTokens = new ArrayList<Token>();
+        String caminho = "file.txt";
+
+        try(BufferedReader reader = new BufferedReader(new FileReader(caminho))){
+
+        String line;
+        List<Token> tokens = new ArrayList<Token>();
+        System.out.print("\nLEXICAL ANALYSIS\n\n");
+        while ((line = reader.readLine()) != null) {
+            tokens = Lexer.lexer(line);
+            System.out.println("Lexical Analysis - " + "Line " + numberLine + ": " + tokens);
+            numberLine++;
+            for (Token token : tokens) {
+                allTokens.add(token);
+            }
+        }
+
+        tokenTypes = Lexer.getTokenTypes(allTokens);
+        System.out.println("\nToken Types: " + java.util.Arrays.toString(tokenTypes));
+        tokenArray =  tokenTypes;
+        lexemeArray = Lexer.getTokenValue(allTokens);
+
+        System.out.print("\nSYNTAX ANALYSIS\n\n");
+        program(tokenArray, lexemeArray);
         
-        try {
-            Path filePath = Paths.get("file.txt");
-            byte[] fileBytes = Files.readAllBytes(filePath);
-            String fileContent = new String(fileBytes);
-            String processedInput = Lexer.processInput(fileContent);
-            System.out.println("Processed input: " + processedInput);
-
-            // Get an array of TokenType values using the Lexer class
-            tokenTypes = Lexer.getTokenTypes(processedInput);
-            System.out.println("Token Types: " + java.util.Arrays.toString(tokenTypes));
-            tokenArray =  tokenTypes;
-            lexemeArray = Lexer.getTokenValue(processedInput);
-
-           
-            program(tokenArray, lexemeArray);
-            //isExpression(tokenArray, lexemeArray);
-            //isAssigment(tokenArray, lexemeArray);
-            
-        } catch (Exception e) {
-            System.out.println("Error reading file: " + e);
+        
+        }catch(Exception e) {
+        	System.out.println("Erro de Leitura!");
         }
   
     }
@@ -82,7 +92,6 @@ public class Parser {
         while (tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.TYPE_SPECIFIER) && !tokenArray[nextToken + 1].equals(TokenType.MAIN)) {  
             System.out.print("\n");
             declaration(tokenArray, lexemeArray);
-            System.out.print("\n");
             
         }
     }
@@ -104,7 +113,7 @@ public class Parser {
             }
         }else{
             while (tokenArray.length > nextToken && (tokenArray[nextToken].equals(TokenType.NUM) || tokenArray[nextToken].equals(TokenType.IDENTIFIER))){  
-                System.out.println("\n");
+                System.out.print("\n");
                 expression(tokenArray, lexemeArray);
                 if(tokenArray.length > nextToken && !tokenArray[nextToken].equals(TokenType.SEMICOLON)){
                     System.out.println("ERROR: Next token expected is SEMICOLON");
@@ -113,7 +122,7 @@ public class Parser {
                     System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
                     nextToken+=1;
                 }
-                System.out.println("\n");
+                System.out.print("\n");
             }
         }
         
@@ -160,7 +169,13 @@ public class Parser {
         
         System.out.println("Enter <declarator>");
         identifier(tokenArray, lexemeArray);
-        if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_SQUARE_BRACKET)){
+        if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.ASSIGN_OP)){
+            System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken] + "\n");
+            nextToken++;
+            expression(tokenArray, lexemeArray);
+            
+        }
+        else if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_SQUARE_BRACKET)){
             System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
             array_size(tokenArray, lexemeArray);
             nextToken++;
@@ -463,6 +478,21 @@ public class Parser {
                 }
             }else{
                 System.out.println("ERROR: Next token expected is LEFT_PARENTHESES");
+                System.exit(0);
+            }
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.LEFT_BRACKET)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+            }else{
+                System.out.println("ERROR: Next token expected is LEFT_BRACKET");
+                System.exit(0);
+            }
+            statement(tokenArray, lexemeArray);
+            if(tokenArray.length > nextToken && tokenArray[nextToken].equals(TokenType.RIGHT_BRACKET)){
+                System.out.println("Next token is " + tokenArray[nextToken] + "\nNext lexeme is " + lexemeArray[nextToken]);
+                nextToken += 1;
+            }else{
+                System.out.println("ERROR: Next token expected is RIGHT_BRACKET");
                 System.exit(0);
             }
             System.out.println("Exit <while_statement>");

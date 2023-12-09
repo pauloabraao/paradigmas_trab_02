@@ -1,11 +1,11 @@
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public class Lexer {
+    public static int numberLine = 1;
 
     public static List<Token> lexer(String inputString) {
         List<Token> tokens = new ArrayList<>();
@@ -14,7 +14,7 @@ public class Lexer {
 
         while (index < length) {
             char currentChar = inputString.charAt(index);
-
+            
             if (Character.isWhitespace(currentChar)) {
                 index++;
                 continue;
@@ -66,7 +66,7 @@ public class Lexer {
                             currentChar = inputString.charAt(index);
                         }
                     }
-                    System.out.println(num + "\nError: Variable name cannot start with number");
+                    System.out.println("\nError - Line " + numberLine + ": Variable name cannot start with number " + "'" + num + "'");
                     System.exit(0);
                 }
                 tokens.add(new Token(TokenType.NUM, num.toString()));
@@ -190,8 +190,8 @@ public class Lexer {
         return tokens;
     }
 
-    public static TokenType[] getTokenTypes(String inputString) {
-        List<Token> tokens = lexer(inputString);
+    public static TokenType[] getTokenTypes(List<Token> tokens) {
+        
         TokenType[] tokenTypes = new TokenType[tokens.size()];
 
         for (int i = 0; i < tokens.size(); i++) {
@@ -201,8 +201,8 @@ public class Lexer {
         return tokenTypes;
     }
 
-    public static String[] getTokenValue(String inputString) {
-        List<Token> tokens = lexer(inputString);
+    public static String[] getTokenValue(List<Token> tokens) {
+        
         String[] tokenValue = new String[tokens.size()];
 
         for (int i = 0; i < tokens.size(); i++) {
@@ -240,16 +240,26 @@ public class Lexer {
     }
 
     public static void main(String[] args) {
-        Path caminho = Paths.get("file.txt");
-        try {
-        byte[] texto = Files.readAllBytes(caminho);
-        String leitura = new String(texto);
-        String processedInput = processInput(leitura);
-        System.out.println("Processed input: " + processedInput);
-        List<Token> tokens = lexer(processedInput);
-        System.out.println("Lexical Analysis: " + tokens);
-        TokenType[] tokenTypes = getTokenTypes(processedInput);
-            System.out.println("Token Types: " + Arrays.toString(tokenTypes));
+        List<Token> allTokens = new ArrayList<Token>();
+        String caminho = "file.txt";
+        try(BufferedReader reader = new BufferedReader(new FileReader(caminho))){
+
+        String line;
+        List<Token> tokens = new ArrayList<Token>();    
+        
+        while ((line = reader.readLine()) != null) {
+            tokens = lexer(line);
+            System.out.println("Lexical Analysis - " + "Line " + numberLine + ": " + tokens);
+            numberLine++;
+            for (Token token : tokens) {
+                allTokens.add(token);
+            }
+            
+        }
+        TokenType[] tokenTypes = getTokenTypes(allTokens);
+        System.out.println("\nToken Types: " + Arrays.toString(tokenTypes));
+
+        
         }catch(Exception e) {
         	System.out.println("Erro de Leitura!");
         } 

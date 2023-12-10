@@ -137,9 +137,6 @@ public class Lexer {
                         if (index + 1 < length && inputString.charAt(index + 1) == '=') {
                             tokens.add(new Token(TokenType.NOT_EQUALS, "!="));
                             index += 2;
-                        } else {
-                            //error
-                            index++;
                         }
                         break;
     
@@ -167,11 +164,7 @@ public class Lexer {
                         if (index + 1 < length && inputString.charAt(index + 1) == '|') {
                             tokens.add(new Token(TokenType.OR_OP, "||"));
                             index += 2;
-                        } else {
-                            tokens.add(new Token(TokenType.UNKNOWN, Character.toString(currentChar)));
-                            index++;
-                            break;
-                        }
+                        } 
                         break;
                     case '&':
                         if (index + 1 < length && inputString.charAt(index + 1) == '&') {
@@ -184,6 +177,7 @@ public class Lexer {
                         }
                         break;
                     default:
+                        tokens.add(new Token(TokenType.UNKNOWN, Character.toString(currentChar)));
                         index++;
                         break;
                 }
